@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Controller, Get, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 
 @Controller()
 export class GatewayController {
@@ -13,12 +13,15 @@ export class GatewayController {
   ) {}
 
   @Get('health')
-  // eslint-disable-next-line @typescript-eslint/require-await
   async health() {
-    const ping = async (serviceName: string, client: ClientProxy) => {
+    const ping = async (
+      serviceName: string,
+      pattern: string,
+      client: ClientProxy,
+    ) => {
       try {
         const result = await firstValueFrom(
-          client.send('service.ping', { from: 'gateway' }),
+          client.send(pattern, { from: 'gateway' }).pipe(timeout(2000)),
         );
 
         return {
@@ -36,9 +39,9 @@ export class GatewayController {
     };
 
     const [catalog, media, search] = await Promise.all([
-      ping('catalog', this.catalogClient),
-      ping('media', this.mediaClient),
-      ping('search', this.searchClient),
+      ping('catalog', 'catalog.ping', this.catalogClient),
+      ping('media', 'media.ping', this.mediaClient),
+      ping('search', 'search.ping', this.searchClient),
     ]);
 
     const ok = [catalog, media, search].every((service) => service.ok);
