@@ -6,7 +6,7 @@ import { MessagePattern } from '@nestjs/microservices';
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
-  @MessagePattern('catalog.ping')
+  @MessagePattern('search.ping')
   ping() {
     return this.searchService.ping();
   }
