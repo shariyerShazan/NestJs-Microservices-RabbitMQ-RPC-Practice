@@ -6,21 +6,26 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 async function bootstrap() {
   process.title = 'catalog';
   const logger = new Logger('catalogBootstrap');
-  const port = Number(process.env.CATALOG_TCP_PORT! ?? 22222);
+
+  const rmqUrl = process.env.RABBITMQ_URL! ?? 'amqp://localhost:5672';
+  const queue = process.env.CATALOG_QUEUE!;
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     CatalogModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.RMQ,
       options: {
-        host: '0.0.0.0',
-        port,
+        urls: [rmqUrl],
+        queue,
+        queueOptions: {
+          durable: false,
+        },
       },
     },
   );
   app.enableShutdownHooks();
   await app.listen();
 
-  logger.log(`Catalog is running at http://localhost:${port}`);
+  logger.log(`Catalog RNQ running on queue ${queue} via ${rmqUrl}`);
 }
 bootstrap();

@@ -5,7 +5,7 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   process.title = 'gateway';
   const logger = new Logger('GatewayBootstrap');
-  const port = Number(process.env.GATEWAY_PORT! ?? 11111);
+  const port = Number(process.env.GATEWAY_PORT! ?? 10000);
   const app = await NestFactory.create(GatewayModule);
   await app.listen(port);
 
