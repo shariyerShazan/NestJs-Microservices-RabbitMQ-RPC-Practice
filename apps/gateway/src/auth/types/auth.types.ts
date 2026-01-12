@@ -1,7 +1,6 @@
 export type UserContext = {
-  clerkUserID: string;
+  clerkUserId: string;
   email: string;
   fullName: string;
   role: 'admin' | 'user';
-  isAdmin: boolean;
 };

@@ -28,7 +28,6 @@ export class userService {
         },
         $setOnInsert: {
           role: 'user',
-          isAdmin: false,
         },
       },
       {
